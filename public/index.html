@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Upload Resume</h2>
+
+<input type="file" id="file" />
+<button onclick="upload()">Upload</button>
+
+<pre id="output"></pre>
+
+<button onclick="generate()">Generate Site</button>
+
+<script>
+let userData = {};
+
+async function upload() {
+  const file = document.getElementById("file").files[0];
+  const formData = new FormData();
+  formData.append("resume", file);
+
+  const res = await fetch("/upload", {
+    method: "POST",
+    body: formData
+  });
+
+  userData = await res.json();
+  document.getElementById("output").innerText = JSON.stringify(userData, null, 2);
+}
+
+async function generate() {
+  const res = await fetch("/generate", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(userData)
+  });
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "site.zip";
+  a.click();
+}
+</script>
+
+</body>
+</html> 
